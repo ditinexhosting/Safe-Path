@@ -11,7 +11,7 @@ const LIGHT_THEME = {
     black: '#141414',
     white: '#FFF',
     status_bar: '#1A1A1A',
-    background: '#F2F3F8',
+    background: '#FEFFFF',
     text: '#000000',
     muted_text: '#B3B3B4'
 }

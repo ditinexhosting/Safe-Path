@@ -51,7 +51,9 @@ const Home = ({ navigation }) => {
         // Pink Path
         '13': [311, 367],
         '14': [292, 282],
-        '15': [240, 299]
+        '15': [240, 299],
+        '16': [226, 279],
+        '17': [220, 270]
     }
 
     const paths = {
@@ -64,6 +66,8 @@ const Home = ({ navigation }) => {
         '3_13': 'M 286.3 377 L 311 367',
         '13_14': 'M 311 367 L 292 282',
         '14_15': 'M 292 282 L 256 295 M 250 296 L 240 299',
+        '15_16': 'M 240 299 C 220,295 226,280 226,279',
+        '16_17': 'M 226,279 S 228,272 237,265 M 235,267 L 229.5,261 L 220,270'
     }
 
     const graph = {
@@ -84,7 +88,8 @@ const Home = ({ navigation }) => {
     }
 
     return (
-        <Container style={styles.centerAll} isTransparentStatusBar={false}>
+        <Container isTransparentStatusBar={false}>
+            <View style={[styles.flex1,styles.centerAll]}>
             <ReactNativeZoomableView
                 maxZoom={1.5}
                 minZoom={0.5}
@@ -114,6 +119,8 @@ const Home = ({ navigation }) => {
                             ${paths['3_13']}
                             ${paths['13_14']}
                             ${paths['14_15']}
+                            ${paths['15_16']}
+                            ${paths['16_17']}
                             `}
                             stroke="#F42C71"
                             strokeWidth="1.1"
@@ -149,6 +156,7 @@ const Home = ({ navigation }) => {
                 */}
                 </View>
             </ReactNativeZoomableView>
+            </View>
         </Container>
     )
 }
