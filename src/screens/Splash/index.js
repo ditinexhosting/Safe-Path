@@ -12,15 +12,12 @@ import { useTheme } from 'src/hooks'
 const Splash = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
     useEffect(() => {
-        setTimeout(()=>navigation.replace('Home'),2000)
+        //setTimeout(()=>navigation.replace('Home'),2000)
     }, [])
     return (
-        <Container style={styles.centerAll} isTransparentStatusBar={false}>
-            <View style={styles.flex1, styles.centerAll}>
-                <Image
-                    style={styles.logo}
-                    source={logo}
-                />
+        <Container isTransparentStatusBar={false}>
+            <View style={[styles.flex1, styles.centerAll]}>
+                <Text><Text style={styles.safe}> SAFE </Text><Text style={styles.path}> PATH</Text></Text>
             </View>
         </Container>
     )

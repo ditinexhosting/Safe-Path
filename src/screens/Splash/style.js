@@ -3,12 +3,18 @@ import {
 } from 'react-native';
 import { Mixins, Spacing, Typography } from 'src/styles'
 
-const styles = StyleSheet.create({
-    logo:{
-        resizeMode: 'contain',
-        width: Mixins.scaleSize(250),
-        height: Mixins.scaleSize(70),
+const style = ({ Colors }) => (StyleSheet.create({
+    safe:{
+        color: Colors.primary,
+        fontSize: Typography.FONT_SIZE_40,
+        backgroundColor: Colors.black
+    },
+    path:{
+        color: Colors.black,
+        fontSize: Typography.FONT_SIZE_40
     }
-});
+})
+);
 
-export default styles
+
+export default style
