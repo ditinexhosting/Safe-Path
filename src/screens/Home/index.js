@@ -1,180 +1,154 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Image,
     Text,
-    Animated,
-    Easing,
-    PermissionsAndroid,
+    TouchableWithoutFeedback
 } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 import style from './style'
-import Geolocation from 'react-native-geolocation-service';
-import Config, { GOOGLE_MAP_API_KEY } from 'src/config'
-import { Container, Toast } from 'src/components'
-import API from 'src/services/api'
-import Header from './header'
-import Body from './body'
-import Popup from './popup'
-import verifyLoginSession from './verifyLoginSession'
-import { useDdux, useTheme } from 'src/hooks'
-import Geocoder from 'react-native-geocoding';
-Geocoder.init(GOOGLE_MAP_API_KEY);
-
-
-var watchId = null
-
-const RADIUS = 10000;
-const latitudeDelta = 0.02
-const longitudeDelta = 0.02
-
-var isInitialized = false
+import { map } from 'src/assets'
+import { Container } from 'src/components'
+import { useTheme } from 'src/hooks'
+import Svg, {
+    SvgCss,
+    Circle,
+    Ellipse,
+    G,
+    TSpan,
+    TextPath,
+    Path,
+    Polygon,
+    Polyline,
+    Line,
+    Rect,
+    Use,
+    Symbol,
+    Defs,
+    LinearGradient,
+    RadialGradient,
+    Stop,
+    ClipPath,
+    Pattern,
+    Mask
+} from 'react-native-svg'
+import { Mixins, Spacing, Typography } from 'src/styles'
+import { Toast } from 'src/components'
+import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView'
+import FindShortestPath from './shortestPath'
 
 const Home = ({ navigation }) => {
-    const isFocused = useIsFocused()
-    const Ddux = useDdux()
-    const userDetails = Ddux.cache('user')
-    const rideDetails = Ddux.cache('ride')
     const [Colors, styles] = useTheme(style)
-    const [permissionPopup, setPermissionPopup] = useState(false)
-    const [nearbyTows, setNearbyTows] = useState([])
-    const [currentLocation, setCurrentLocation] = useState({
-        latitude: 31.767664,
-        longitude: 35.216522,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-    })
-    const map = useRef(null)
 
-    useEffect(() => {
-        verifyLoginSession(userDetails, Ddux)
-    }, [userDetails])
+    const refugeChambers = [ '4' ]
 
-    useEffect(() => {
-        if (isFocused) {
-            //requestLocationPremission()
-        }
-        return () => {
-            if (watchId)
-                Geolocation.clearWatch(watchId);
-        };
-    }, [isFocused]);
-
-    const requestLocationPermission = () => {
-        try {
-            if (Config.isAndroid)
-                requestPermissionsAndroid()
-            else
-                requestPermissionsIOS()
-        }
-        catch (e) {
-            console.log(e)
-        }
+    const nodes = {
+        '1': [328.5, 477],
+        '2': [304, 420],
+        '3': [286.3, 377],
+        '4': [267, 330],
+        '5': [260, 312],
+        '6': [239, 262],
+        // Pink Path
+        '13': [311, 367],
+        '14': [292, 282],
+        '15': [240, 299]
     }
 
-    const getNearestTows = async (location) => {
-        /*
-         * API GetNearestTows
-         */
-        let response = await API.getNearestTows(location.latitude, location.longitude)
-        if (!response.status) {
-            return Toast.show({ type: 'error', message: response.error })
-        }
-        setNearbyTows(response.data)
+    const paths = {
+        '1_2': 'M 328.5 477 L 304 420',
+        '2_3': 'M 304 420 L 286.3 377',
+        '3_4': 'M 286.3 377 L 267 330',
+        '4_5': 'M 267 330 L 260 312',
+        '5_6': 'M 260 312 L 239 262',
+        // Pink Path
+        '3_13': 'M 286.3 377 L 311 367',
+        '13_14': 'M 311 367 L 292 282',
+        '14_15': 'M 292 282 L 256 295 M 250 296 L 240 299',
     }
 
-    const onDestinationSet = async (destination) => {
-        if (userDetails) {
-            navigation.navigate('Home_Booking', { destination: destination, source: currentLocation })
-        }
-        else {
-            navigation.navigate('Login', { destination: destination, source: currentLocation })
-        }
+    const graph = {
+        '1': { '2': 10 },
+        '2': { '3': 8, '1': 10 },
+        '3': { '4': 8.5, '2': 8, '13': 4.5 },
+        '4': { '5': 2.5, '3': 8.5 },
+        '5': { '6': 9, '4': 2.5 },
+        '6': { '5': 9 },
+        '13': { '3': 4.5, '14': 15 },
+        '14': { '13': 15, '15': 10 },
+        '15': { '14': 10 }
     }
 
-    const onLocationAvailable = () => {
-        watchId = Geolocation.watchPosition(
-            pos => {
-                if (map.current) {
-                    const currentGeoLocation = { latitude: pos.coords.latitude, longitude: pos.coords.longitude, latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta }
-                    setCurrentLocation(currentGeoLocation)
-                    if (!isInitialized) {
-                        isInitialized = true
-                        getNearestTows(currentGeoLocation)
-                        map.current.animateToRegion(currentGeoLocation, 1000);
-                    }
-                }
-            },
-            e => {
-                console.log('watchId Error => ', e)
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 20000,
-                maximumAge: 1000,
-                useSignificantChanges: true,
-                distanceFilter: 500, //500m
-            }
-        )
+    const onNodePress = (node) => {
+        const shortestPath = FindShortestPath(graph,node,refugeChambers[0])
+        return Toast.show({ type: 'success', message: 'Node : ' + node + '\nPath to refuge chamber : ' + shortestPath.path.join(' > ') })
     }
-
-    const requestPermissionsAndroid = async () => {
-        try {
-            let granted = true
-            let permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION)
-            if (permission !== PermissionsAndroid.RESULTS.GRANTED)
-                granted = false
-            permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION)
-            if (permission !== PermissionsAndroid.RESULTS.GRANTED)
-                granted = false
-
-            if (!granted)
-                setPermissionPopup(true)
-            else {
-                Geolocation.getCurrentPosition(
-                    info => { onLocationAvailable() },
-                    error => {
-                        console.log('request permission ==>>', error)
-                        setPermissionPopup(true)
-                    }
-                )
-            }
-
-        } catch (err) {
-            console.warn(err);
-        }
-    };
-
-    const requestPermissionsIOS = async () => {
-        try {
-            let granted = true
-            let always = await Geolocation.requestAuthorization('always')
-            let whenInUse = await Geolocation.requestAuthorization('whenInUse')
-            if (always !== 'granted' && whenInUse !== 'granted')
-                granted = false
-
-            if (!granted)
-                setPermissionPopup(true)
-            else {
-                onLocationAvailable()
-                Geolocation.getCurrentPosition(
-                    info => { onLocationAvailable() },
-                    error => {
-                        console.log('request permission ==>>', error)
-                        setPermissionPopup(true)
-                    }
-                )
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-    };
 
     return (
-        <Container isTransparentStatusBar={true} style={styles.fullHeightContainer}>
-            <Header _this={{ navigation, onDestinationSet, rideDetails }} />
-            <Body _this={{ map, currentLocation, navigation, requestLocationPermission, nearbyTows }} />
-            <Popup _this={{ permissionPopup, setPermissionPopup, requestLocationPermission }} />
+        <Container style={styles.centerAll} isTransparentStatusBar={false}>
+            <ReactNativeZoomableView
+                maxZoom={1.5}
+                minZoom={0.5}
+                zoomStep={0.5}
+                initialZoom={1}
+                bindToBorders={true}
+                onZoomAfter={null}
+            >
+
+                <View style={styles.container}>
+                    {<Image
+                        style={styles.logo}
+                        source={map}
+                    />}
+                    <Svg height="100%" width="100%" viewBox="0 0 350 600">
+                        <Defs>
+                            <G id="refugeChamber">
+                                <Path
+                                d="M 0,4 L 8,4 M 4,0 L 4,8"
+                                stroke="#10772C"
+                                strokeWidth="3"
+                                />
+                            </G>
+                        </Defs>
+                        <Path
+                            d={`
+                            ${paths['3_13']}
+                            ${paths['13_14']}
+                            ${paths['14_15']}
+                            `}
+                            stroke="#F42C71"
+                            strokeWidth="1.1"
+                        />
+                        <Path
+                            d={`
+                            ${paths['1_2']}
+                            ${paths['2_3']}
+                            ${paths['3_4']}
+                            ${paths['4_5']}
+                            ${paths['5_6']}
+                            `}
+                            stroke="black"
+                            strokeWidth="1.5"
+                        />
+                        {
+                            Object.keys(nodes).map(node => {
+                                return (
+                                    <TouchableWithoutFeedback key={node} onPress={() => onNodePress(node)} >
+                                        <G>
+                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
+                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
+                                        </G>
+                                    </TouchableWithoutFeedback>
+                                )
+                            })
+                        }
+
+                        <Use href="#refugeChamber" x="255" y="330" />
+
+                    </Svg>
+                    {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
+                */}
+                </View>
+            </ReactNativeZoomableView>
         </Container>
     )
 }
