@@ -39,7 +39,7 @@ import FindShortestPath from './shortestPath'
 const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
 
-    const refugeChambers = [ '4', '16', '7', '8', '9', '12', '22', '23', '25', '26', '27', '28' ]
+    const refugeChambers = [ '4', '16', '7', '8', '9', '12', '22', '23', '25', '26', '27', '28', '30', '32' ]
 
     const nodes = {
         '1': [328.5, 477],
@@ -72,6 +72,10 @@ const Home = ({ navigation }) => {
         '27': [100, 398],
         '28': [89.5, 443],
         '29': [48, 433],
+        '30': [58, 396],
+        '31': [81, 311],
+        '32': [35, 485],
+        '33': [196, 300],
     }
 
     const paths = {
@@ -107,6 +111,10 @@ const Home = ({ navigation }) => {
         '26_27': 'M 91.4 170 L 95 264 M 95 268 L 95.4 274 M 95.5 278 L 95.7 285 M 96.5 295 L 96.8 301 M 97 304 L 97 311 M 97.4 314 L 97.4 321 M 97.4 323.5 L 100 398',
         '27_28': 'M 100 398 L 89.5 443',
         '28_29': 'M 89.5 443 L 48 433',
+        '29_30': 'M 48 433 L 58 396',
+        '30_31': 'M 58 396 L 81 311',
+        '29_32': 'M 48 433 L 35 485',
+        '32_33': 'M 267 330 S 264,314 277.5,320 S 294.5,340 293,340 L 293,350 L 284,362 M 280,368 S 274,380 255,400 C 245,407 230,410 220,390 C 220,390 217,385 213,370 L 196 300',
     }
 
     const graph = {
@@ -138,7 +146,10 @@ const Home = ({ navigation }) => {
         '26': { '24': 6, '27': 45 },
         '27': { '26': 45, '28': 10 },
         '28': { '27': 10, '29': 9 },
-        '29': { '28': 9 },
+        '29': { '28': 9, '30': 9, '32': 15 },
+        '30': { '29': 9, '31': 22 },
+        '31': { '30': 22 },
+        '32': { '29': 15 },
     }
 
     const onNodePress = (node) => {
@@ -233,8 +244,18 @@ const Home = ({ navigation }) => {
                             ${paths['26_27']}
                             ${paths['27_28']}
                             ${paths['28_29']}
+                            ${paths['29_30']}
+                            ${paths['30_31']}
+                            ${paths['29_32']}
                             `}
                             stroke="#B67734" //Orange
+                            strokeWidth="1.5"
+                        />
+                        <Path
+                            d={`
+                            ${paths['32_33']}
+                            `}
+                            stroke="#42A0C4" //Blue
                             strokeWidth="1.5"
                         />
                         {
@@ -263,6 +284,9 @@ const Home = ({ navigation }) => {
                         <Use href="#refugeChamber" x="81" y="162" />
                         <Use href="#refugeChamber" x="101" y="400" />
                         <Use href="#refugeChamber" x="71" y="431" />
+                        <Use href="#refugeChamber" x="62" y="396" />
+                        <Use href="#refugeChamber" x="40" y="470" />
+                        <Use href="#refugeChamber" x="44" y="455" />
 
                     </Svg>
                     {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
