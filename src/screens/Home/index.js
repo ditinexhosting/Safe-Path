@@ -3,7 +3,8 @@ import {
     View,
     Image,
     Text,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    Switch
 } from 'react-native';
 import style from './style'
 import { map } from 'src/assets'
@@ -29,7 +30,8 @@ import Svg, {
     Stop,
     ClipPath,
     Pattern,
-    Mask
+    Mask,
+    Text as SVGText
 } from 'react-native-svg'
 import { Mixins, Spacing, Typography } from 'src/styles'
 import { Toast } from 'src/components'
@@ -38,9 +40,9 @@ import FindShortestPath from './shortestPath'
 
 const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
-    const [showOnlyMap, setShowOnlyMap] = useState(false)
+    const [isShowOnlyMap, setIsShowOnlyMap] = useState(false)
 
-    const refugeChambers = [ '4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33' ]
+    const refugeChambers = [ '4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39' ]
 
     const nodes = {
         '1': [328.5, 477],
@@ -135,13 +137,13 @@ const Home = ({ navigation }) => {
         '1': { '2': 10 },
         '2': { '3': 8, '1': 10 },
         '3': { '4': 8.5, '2': 8, '13': 4.5 },
-        '4': { '5': 2.5, '3': 8.5 },
+        '4': { '5': 2.5, '3': 8.5, '37': 20 },
         '5': { '6': 9, '4': 2.5, '20': 21 },
         '6': { '5': 9, '7': 8 },
         '7': { '6': 8, '8': 9, '21': 9 },
         '8': { '7': 9, '9': 9 },
         '9': { '8': 9, '10': 9 },
-        '10': { '9': 9, '11': 20 },
+        '10': { '9': 9, '11': 20, '36': 10 },
         '11': { '10': 20, '12': 12 },
         '12': { '11': 12 },
         '13': { '3': 4.5, '14': 15 },
@@ -164,6 +166,13 @@ const Home = ({ navigation }) => {
         '30': { '29': 9, '31': 22 },
         '31': { '30': 22 },
         '32': { '29': 15 },
+        '33': { '37': 14, '34': 4 },
+        '34': { '33': 4, '35': 18, '36': 10 },
+        '35': { '34': 18 },
+        '36': { '34': 10, '10': 10 },
+        '37': { '4': 20, '33': 14, '38': 8 },
+        '38': { '37': 8, '39': 8 },
+        '39': { '38': 8 },
     }
 
     const onNodePress = (node) => {
@@ -173,6 +182,14 @@ const Home = ({ navigation }) => {
 
     return (
         <Container isTransparentStatusBar={false}>
+            <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isShowOnlyMap ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>setIsShowOnlyMap(!isShowOnlyMap)}
+                value={isShowOnlyMap}
+                style={styles.toggleSwitch}
+            />
             <View style={[styles.flex1,styles.centerAll]}>
             <ReactNativeZoomableView
                 maxZoom={1.5}
@@ -184,10 +201,11 @@ const Home = ({ navigation }) => {
             >
 
                 <View style={styles.container}>
-                    {<Image
+                    <Image
                         style={styles.logo}
                         source={map}
-                    />}
+                    />
+                    {isShowOnlyMap &&
                     <Svg height="100%" width="100%" viewBox="0 0 350 600">
                         <Defs>
                             <G id="refugeChamber">
@@ -291,6 +309,7 @@ const Home = ({ navigation }) => {
                                         <G>
                                             <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                             <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
+                                            <SVGText x={nodes[node][0]} y={nodes[node][1]} text-anchor="middle" stroke="#51c5cf" stroke-width="2px" dy="5" dx="5" fontSize="10px">{node}</SVGText>
                                         </G>
                                     </TouchableWithoutFeedback>
                                 )
@@ -317,8 +336,12 @@ const Home = ({ navigation }) => {
                         <Use href="#refugeChamber" x="42" y="483" />
                         <Use href="#refugeChamber" x="44" y="455" />
                         <Use href="#refugeChamber" x="202" y="298" />
-
+                        <Use href="#refugeChamber" x="122" y="295" />
+                        <Use href="#refugeChamber" x="145" y="308" />
+                        <Use href="#refugeChamber" x="222" y="455" />
+                        <Use href="#refugeChamber" x="270" y="502" />
                     </Svg>
+                    }
                     {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
                 */}
                 </View>
