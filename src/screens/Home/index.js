@@ -42,7 +42,7 @@ const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
     const [isShowOnlyMap, setIsShowOnlyMap] = useState(false)
 
-    const refugeChambers = [ '4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39' ]
+    const refugeChambers = ['4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39']
 
     const nodes = {
         '1': [328.5, 477],
@@ -176,48 +176,51 @@ const Home = ({ navigation }) => {
     }
 
     const onNodePress = (node) => {
-        const shortestPath = FindShortestPath(graph,node,refugeChambers[0])
+        const shortestPath = FindShortestPath(graph, node, refugeChambers[0])
         return Toast.show({ type: 'success', message: 'Node : ' + node + '\nPath to refuge chamber : ' + shortestPath.path.join(' > ') })
     }
 
     return (
         <Container isTransparentStatusBar={false}>
-            <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isShowOnlyMap ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>setIsShowOnlyMap(!isShowOnlyMap)}
-                value={isShowOnlyMap}
-                style={styles.toggleSwitch}
-            />
-            <View style={[styles.flex1,styles.centerAll]}>
-            <ReactNativeZoomableView
-                maxZoom={1.5}
-                minZoom={0.5}
-                zoomStep={0.5}
-                initialZoom={1}
-                bindToBorders={true}
-                onZoomAfter={null}
-            >
+            <View style={styles.toggleSwitchContainer}>
+                <Text style={styles.switchView}>{isShowOnlyMap ? 'Node View' : 'Map View'}</Text>
+                <Switch
+                    trackColor={{ false: Colors.grey, true: Colors.secondary_very_light }}
+                    thumbColor={isShowOnlyMap ? Colors.primary : Colors.muted_text}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={() => setIsShowOnlyMap(!isShowOnlyMap)}
+                    value={isShowOnlyMap}
+                    style={styles.marginLeft5}
+                />
+            </View>
+            <View style={[styles.flex1, styles.centerAll]}>
+                <ReactNativeZoomableView
+                    maxZoom={1.5}
+                    minZoom={0.5}
+                    zoomStep={0.5}
+                    initialZoom={1}
+                    bindToBorders={true}
+                    onZoomAfter={null}
+                >
 
-                <View style={styles.container}>
-                    <Image
-                        style={styles.logo}
-                        source={map}
-                    />
-                    {isShowOnlyMap &&
-                    <Svg height="100%" width="100%" viewBox="0 0 350 600">
-                        <Defs>
-                            <G id="refugeChamber">
+                    <View style={styles.container}>
+                        <Image
+                            style={styles.logo}
+                            source={map}
+                        />
+                        {isShowOnlyMap &&
+                            <Svg height="100%" width="100%" viewBox="0 0 350 600">
+                                <Defs>
+                                    <G id="refugeChamber">
+                                        <Path
+                                            d="M 0,3 L 6,3 M 3,0 L 3,6"
+                                            stroke="#10772C"
+                                            strokeWidth="2.5"
+                                        />
+                                    </G>
+                                </Defs>
                                 <Path
-                                d="M 0,3 L 6,3 M 3,0 L 3,6"
-                                stroke="#10772C"
-                                strokeWidth="2.5"
-                                />
-                            </G>
-                        </Defs>
-                        <Path
-                            d={`
+                                    d={`
                             ${paths['3_13']}
                             ${paths['13_14']}
                             ${paths['14_15']}
@@ -225,11 +228,11 @@ const Home = ({ navigation }) => {
                             ${paths['16_17']}
                             ${paths['14_18']}
                             `}
-                            stroke="#F42C71" //Pink
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#F42C71" //Pink
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
                             ${paths['1_2']}
                             ${paths['2_3']}
                             ${paths['3_4']}
@@ -242,36 +245,36 @@ const Home = ({ navigation }) => {
                             ${paths['10_11']}
                             ${paths['11_12']}
                             `}
-                            stroke="black" //Black
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
+                                    stroke="black" //Black
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                             ${paths['18_19']}
                             `}
-                            stroke="#A56EA6" //Violet
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#A56EA6" //Violet
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
                             ${paths['5_20']}
                             ${paths['7_21']}
                             `}
-                            stroke="#61BFB1" //Greenish
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#61BFB1" //Greenish
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
                             ${paths['8_22']}
                             ${paths['22_23']}
                             ${paths['23_24']}
                             ${paths['24_25']}
                             `}
-                            stroke="#8D77FE" //Purple
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#8D77FE" //Purple
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                             ${paths['24_26']}
                             ${paths['26_27']}
                             ${paths['27_28']}
@@ -280,72 +283,72 @@ const Home = ({ navigation }) => {
                             ${paths['30_31']}
                             ${paths['29_32']}
                             `}
-                            stroke="#B67734" //Orange
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#B67734" //Orange
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                             ${paths['32_33']}
                             ${paths['33_34']}
                             ${paths['34_35']}
                             ${paths['35_36']}
                             ${paths['36_37']}
                             `}
-                            stroke="#42A0C4" //Blue
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
+                                    stroke="#42A0C4" //Blue
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                             ${paths['37_38']}
                             ${paths['38_39']}
                             `}
-                            stroke="#FFD000" //Yellow
-                            strokeWidth="1.5"
-                        />
-                        {
-                            Object.keys(nodes).map(node => {
-                                return (
-                                    <TouchableWithoutFeedback key={node} onPress={() => onNodePress(node)} >
-                                        <G>
-                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
-                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                            <SVGText x={nodes[node][0]} y={nodes[node][1]} text-anchor="middle" stroke="#51c5cf" stroke-width="2px" dy="5" dx="5" fontSize="10px">{node}</SVGText>
-                                        </G>
-                                    </TouchableWithoutFeedback>
-                                )
-                            })
-                        }
+                                    stroke="#FFD000" //Yellow
+                                    strokeWidth="1.5"
+                                />
+                                {
+                                    Object.keys(nodes).map(node => {
+                                        return (
+                                            <TouchableWithoutFeedback key={node} onPress={() => onNodePress(node)} >
+                                                <G>
+                                                    <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
+                                                    <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
+                                                    {/*<SVGText x={nodes[node][0]} y={nodes[node][1]} text-anchor="middle" stroke="#51c5cf" stroke-width="2px" dy="5" dx="5" fontSize="10px">{node}</SVGText>*/}
+                                                </G>
+                                            </TouchableWithoutFeedback>
+                                        )
+                                    })
+                                }
 
-                        <Use href="#refugeChamber" x="255" y="330" />
-                        <Use href="#refugeChamber" x="231" y="273" />
-                        <Use href="#refugeChamber" x="227" y="215" />
-                        <Use href="#refugeChamber" x="190" y="168.5" />
-                        <Use href="#refugeChamber" x="161" y="214.5" />
-                        <Use href="#refugeChamber" x="36" y="357" />
-                        <Use href="#refugeChamber" x="28" y="366" />
-                        <Use href="#refugeChamber" x="44" y="348" />
-                        <Use href="#refugeChamber" x="56" y="336" />
-                        <Use href="#refugeChamber" x="111" y="155" />
-                        <Use href="#refugeChamber" x="137" y="120" />
-                        <Use href="#refugeChamber" x="70" y="127" />
-                        <Use href="#refugeChamber" x="81" y="162" />
-                        <Use href="#refugeChamber" x="101" y="400" />
-                        <Use href="#refugeChamber" x="71" y="431" />
-                        <Use href="#refugeChamber" x="62" y="396" />
-                        <Use href="#refugeChamber" x="40" y="470" />
-                        <Use href="#refugeChamber" x="42" y="483" />
-                        <Use href="#refugeChamber" x="44" y="455" />
-                        <Use href="#refugeChamber" x="202" y="298" />
-                        <Use href="#refugeChamber" x="122" y="295" />
-                        <Use href="#refugeChamber" x="145" y="308" />
-                        <Use href="#refugeChamber" x="222" y="455" />
-                        <Use href="#refugeChamber" x="270" y="502" />
-                    </Svg>
-                    }
-                    {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
+                                <Use href="#refugeChamber" x="255" y="330" />
+                                <Use href="#refugeChamber" x="231" y="273" />
+                                <Use href="#refugeChamber" x="227" y="215" />
+                                <Use href="#refugeChamber" x="190" y="168.5" />
+                                <Use href="#refugeChamber" x="161" y="214.5" />
+                                <Use href="#refugeChamber" x="36" y="357" />
+                                <Use href="#refugeChamber" x="28" y="366" />
+                                <Use href="#refugeChamber" x="44" y="348" />
+                                <Use href="#refugeChamber" x="56" y="336" />
+                                <Use href="#refugeChamber" x="111" y="155" />
+                                <Use href="#refugeChamber" x="137" y="120" />
+                                <Use href="#refugeChamber" x="70" y="127" />
+                                <Use href="#refugeChamber" x="81" y="162" />
+                                <Use href="#refugeChamber" x="101" y="400" />
+                                <Use href="#refugeChamber" x="71" y="431" />
+                                <Use href="#refugeChamber" x="62" y="396" />
+                                <Use href="#refugeChamber" x="40" y="470" />
+                                <Use href="#refugeChamber" x="42" y="483" />
+                                <Use href="#refugeChamber" x="44" y="455" />
+                                <Use href="#refugeChamber" x="202" y="298" />
+                                <Use href="#refugeChamber" x="122" y="295" />
+                                <Use href="#refugeChamber" x="145" y="308" />
+                                <Use href="#refugeChamber" x="222" y="455" />
+                                <Use href="#refugeChamber" x="270" y="502" />
+                            </Svg>
+                        }
+                        {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
                 */}
-                </View>
-            </ReactNativeZoomableView>
+                    </View>
+                </ReactNativeZoomableView>
             </View>
         </Container>
     )
