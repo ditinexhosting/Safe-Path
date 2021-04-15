@@ -34,10 +34,9 @@ const styles = StyleSheet.create({
         zIndex: 999
     },
     fire_selection_container: {
+        height: Mixins.scaleHeight(100),
         position: 'absolute',
-        bottom: Spacing.SCALE_50,
-        right: Spacing.SCALE_20,
-        zIndex: 999
+        bottom: 0
     },
     save_button: {
         backgroundColor: 'tomato',

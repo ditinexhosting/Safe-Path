@@ -47,6 +47,7 @@ const Home = ({ navigation }) => {
     const [isSelectingFireNode, setIsSelectingFireNode] = useState(false)
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedNode, setselectedNode] = useState({own: null,fire: null})
+    const [shortestChamberPath, setShortestChamberPath] = useState(null)
 
     const refugeChambers = ['4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39']
 
@@ -117,9 +118,10 @@ const Home = ({ navigation }) => {
         '5_20': 'M 260 312 L 266.5 304 L 268.5 292 M 269 288 L 276.5 232 L 267 224',
         '7_21': 'M 222 222 L 229.5 207 L 250 205 M 229.5 207 L 231 196 M 226 214 L 218 195',
         // Purple
-        '8_22': 'M 200 169 L 104 148',
+        '8_35': 'M 200 169 L 165 161.5',
+        '22_35': 'M 165 161.5 L 104 148',
         '22_23': 'M 104 148 L 155 102',
-        '23_24': 'M 104 148 L 90 138',
+        '22_24': 'M 104 148 L 90 138',
         '24_25': 'M 90 138 L 53 109',
         //Orange
         '24_26': 'M 90 138 L 91.4 170',
@@ -129,11 +131,12 @@ const Home = ({ navigation }) => {
         '29_30': 'M 48 433 L 58 396',
         '30_31': 'M 58 396 L 81 311',
         '29_32': 'M 48 433 L 35 485',
-        '32_33': 'M 267 330 S 264,314 277.5,320 S 294.5,340 293,340 L 293,350 L 284,362 M 280,368 S 274,380 255,400 C 245,407 230,410 220,390 C 220,390 217,385 213,370 L 196 300',
+        '4_37': '',
+        '33_37': 'M 267 330 S 264,314 277.5,320 S 294.5,340 293,340 L 293,350 L 284,362 M 280,368 S 274,380 255,400 C 245,407 230,410 220,390 C 220,390 217,385 213,370 L 196 300',
         '33_34': 'M 196 300 L 190 272',
         '34_35': 'M 190 272 L 174 205 M 172 197 L 163 160',
-        '35_36': 'M 190 272 L 135 313',
-        '36_37': 'M 133 313 L 134 246 M 133 313 L 125 330',
+        '34_36': 'M 190 272 L 135 313',
+        '10_36': 'M 133 313 L 134 246 M 133 313 L 125 330',
         // yellow
         '37_38': 'M 223 398 L 229 415 M 229 415 L 220 420 M 220 420 L 238 458 M 238 455 L 226 465',
         '38_39': 'M 237 458 L 261 510 M 261 507 L 275 495 M 240 465 L 250 456',
@@ -145,23 +148,23 @@ const Home = ({ navigation }) => {
         '3': { '4': 8.5, '2': 8, '13': 4.5 },
         '4': { '5': 2.5, '3': 8.5, '37': 20 },
         '5': { '6': 9, '4': 2.5, '20': 21 },
-        '6': { '5': 9, '7': 8 },
+        '6': { '5': 9, '7': 8, '16': 4, '17': 4.5 },
         '7': { '6': 8, '8': 9, '21': 9 },
-        '8': { '7': 9, '9': 9 },
+        '8': { '7': 9, '9': 9, '35': 8 },
         '9': { '8': 9, '10': 9 },
         '10': { '9': 9, '11': 20, '36': 10 },
         '11': { '10': 20, '12': 12 },
         '12': { '11': 12 },
         '13': { '3': 4.5, '14': 15 },
-        '14': { '13': 15, '15': 10, '18': 1.5 },
-        '15': { '14': 10, '16': 3 },
+        '14': { '13': 15, '18': 1.5, '19': 12 },
+        '15': { '16': 3, '18': 6.5 },
         '16': { '15': 3, '17': 4, '6': 2.5 },
         '17': { '16': 4, '6': 3 },
-        '18': { '14': 1.5, '19': 11 },
-        '19': { '18': 11 },
+        '18': { '14': 1.5, '19': 11, '15': 6.5 },
+        '19': { '18': 11, '14': 12 },
         '20': { '5': 21 },
-        '21': { '7': 9, '22': 14 },
-        '22': { '21': 14, '23': 11, '24': 1 },
+        '21': { '7': 9 },
+        '22': { '23': 11, '24': 1, '35': 10 },
         '23': { '22': 11 },
         '24': { '22': 1, '25': 9, '26': 6 },
         '25': { '24': 9 },
@@ -174,7 +177,7 @@ const Home = ({ navigation }) => {
         '32': { '29': 15 },
         '33': { '37': 14, '34': 4 },
         '34': { '33': 4, '35': 18, '36': 10 },
-        '35': { '34': 18 },
+        '35': { '34': 18, '22': 10, '8': 8 },
         '36': { '34': 10, '10': 10 },
         '37': { '4': 20, '33': 14, '38': 8 },
         '38': { '37': 8, '39': 8 },
@@ -182,8 +185,44 @@ const Home = ({ navigation }) => {
     }
 
     const onNodePress = (node) => {
-        const shortestPath = FindShortestPath(graph, node, refugeChambers[0])
-        return Toast.show({ type: 'success', message: 'Node : ' + node + '\nPath to refuge chamber : ' + shortestPath.path.join(' > ') })
+        console.log(node)
+        if(isSelectionMode && isSelectingOwnNode)
+            setselectedNode({...selectedNode,own: node})
+        else if(isSelectionMode && !isSelectingOwnNode)
+            setselectedNode({...selectedNode,fire: node})
+        else
+        {}
+    }
+
+    const getNearestRefugePath=()=>{
+        const nonFireGraph = graph
+        nonFireGraph[selectedNode.fire] = null
+        if(nonFireGraph[selectedNode.own][selectedNode.fire])
+            nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
+        const ownNode = selectedNode.own
+        var shortestChamber = null
+        // console.log(nonFireGraph)
+        for(var i=0;i<refugeChambers.length;i++)
+        {
+            const shortestPath = FindShortestPath(nonFireGraph, ownNode, refugeChambers[i])
+            // console.log(shortestPath, i)
+            if(!shortestChamber || shortestChamber.distance>shortestPath.distance)
+                shortestChamber = shortestPath
+        }
+        console.log(shortestChamber)
+        // // make path
+        var pathSvg = ""
+        var p;
+        for(var j=0;j<shortestChamber.path.length-1;j++)
+        {
+            if(shortestChamber.path[j]<shortestChamber.path[j+1])
+                p = shortestChamber.path[j]+'_'+shortestChamber.path[j+1]
+            else
+                p = shortestChamber.path[j+1]+'_'+shortestChamber.path[j]
+            console.log(p)
+            pathSvg = pathSvg + paths[p.toString()]
+        }
+        setShortestChamberPath(pathSvg)
     }
 
     return (
@@ -199,7 +238,7 @@ const Home = ({ navigation }) => {
                     style={styles.marginLeft5}
                 />
             </View>
-            <View style={[styles.flex1, styles.centerAll]}>
+            <View style={[styles.flex1, styles.centerAll,{overflow: 'hidden'}]}>
                 <ReactNativeZoomableView
                     maxZoom={1.5}
                     minZoom={0.5}
@@ -217,6 +256,13 @@ const Home = ({ navigation }) => {
                         {isShowOnlyMap &&
                             <Svg height="100%" width="100%" viewBox="0 0 350 600">
                                 <Defs>
+                                    <G id="refugeChamber">
+                                        <Path
+                                            d="M 0,3 L 6,3 M 3,0 L 3,6"
+                                            stroke="#10772C"
+                                            strokeWidth="2.5"
+                                        />
+                                    </G>
                                     <G id="mypoint">
                                         <Path
                                         d="M16 0c-5.523 0-10 4.477-10 10 0 10 10 22 10 22s10-12 10-22c0-5.523-4.477-10-10-10zM16 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
@@ -234,90 +280,97 @@ const Home = ({ navigation }) => {
                                 </Defs>
                                 <Path
                                     d={`
-                                    ${paths['3_13']}
-                                    ${paths['13_14']}
-                                    ${paths['14_15']}
-                                    ${paths['15_16']}
-                                    ${paths['16_17']}
-                                    ${paths['14_18']}
+                                        ${paths['3_13']}
+                                        ${paths['13_14']}
+                                        ${paths['14_15']}
+                                        ${paths['15_16']}
+                                        ${paths['16_17']}
+                                        ${paths['14_18']}
                                     `}
-                                            stroke="#F42C71" //Pink
-                                            strokeWidth="1.1"
-                                        />
+                                    stroke="#F42C71" //Pink
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
+                                        ${paths['1_2']}
+                                        ${paths['2_3']}
+                                        ${paths['3_4']}
+                                        ${paths['4_5']}
+                                        ${paths['5_6']}
+                                        ${paths['6_7']}
+                                        ${paths['7_8']}
+                                        ${paths['8_9']}
+                                        ${paths['9_10']}
+                                        ${paths['10_11']}
+                                        ${paths['11_12']}
+                                    `}
+                                        stroke="black" //Black
+                                        strokeWidth="1.5"
+                                    />
                                         <Path
                                             d={`
-                                    ${paths['1_2']}
-                                    ${paths['2_3']}
-                                    ${paths['3_4']}
-                                    ${paths['4_5']}
-                                    ${paths['5_6']}
-                                    ${paths['6_7']}
-                                    ${paths['7_8']}
-                                    ${paths['8_9']}
-                                    ${paths['9_10']}
-                                    ${paths['10_11']}
-                                    ${paths['11_12']}
-                                    `}
-                                            stroke="black" //Black
-                                            strokeWidth="1.5"
-                                        />
-                                        <Path
-                                            d={`
-                                    ${paths['18_19']}
-                                    `}
+                                                ${paths['18_19']}
+                                            `}
                                             stroke="#A56EA6" //Violet
                                             strokeWidth="1.1"
                                         />
                                         <Path
                                             d={`
-                                    ${paths['5_20']}
-                                    ${paths['7_21']}
-                                    `}
+                                                ${paths['5_20']}
+                                                ${paths['7_21']}
+                                            `}
                                             stroke="#61BFB1" //Greenish
                                             strokeWidth="1.1"
                                         />
                                         <Path
                                             d={`
-                                    ${paths['8_22']}
-                                    ${paths['22_23']}
-                                    ${paths['23_24']}
-                                    ${paths['24_25']}
-                                    `}
+                                                ${paths['8_35']}
+                                                ${paths['22_35']}
+                                                ${paths['22_23']}
+                                                ${paths['22_24']}
+                                                ${paths['24_25']}
+                                            `}
                                             stroke="#8D77FE" //Purple
                                             strokeWidth="1.5"
                                         />
                                         <Path
                                             d={`
-                                    ${paths['24_26']}
-                                    ${paths['26_27']}
-                                    ${paths['27_28']}
-                                    ${paths['28_29']}
-                                    ${paths['29_30']}
-                                    ${paths['30_31']}
-                                    ${paths['29_32']}
-                                    `}
+                                                ${paths['24_26']}
+                                                ${paths['26_27']}
+                                                ${paths['27_28']}
+                                                ${paths['28_29']}
+                                                ${paths['29_30']}
+                                                ${paths['30_31']}
+                                                ${paths['29_32']}
+                                            `}
                                             stroke="#B67734" //Orange
                                             strokeWidth="1.5"
                                         />
                                         <Path
                                             d={`
-                                    ${paths['32_33']}
-                                    ${paths['33_34']}
-                                    ${paths['34_35']}
-                                    ${paths['35_36']}
-                                    ${paths['36_37']}
-                                    `}
+                                                ${paths['4_37']}
+                                                ${paths['33_37']}
+                                                ${paths['33_34']}
+                                                ${paths['34_35']}
+                                                ${paths['34_36']}
+                                                ${paths['10_36']}
+                                            `}
                                             stroke="#42A0C4" //Blue
                                             strokeWidth="1.5"
                                         />
                                         <Path
                                             d={`
-                                    ${paths['37_38']}
-                                    ${paths['38_39']}
-                                    `}
-                                    stroke="#FFD000" //Yellow
-                                    strokeWidth="1.5"
-                                />
+                                                ${paths['37_38']}
+                                                ${paths['38_39']}
+                                            `}
+                                            stroke="#FFD000" //Yellow
+                                            strokeWidth="1.5"
+                                        />
+                                        <Path
+                                            d={shortestChamberPath}
+                                            stroke="#4BB543" //Yellow
+                                            strokeWidth="4"
+                                        />
                                 {
                                     Object.keys(nodes).map(node => {
                                         return (
@@ -326,7 +379,6 @@ const Home = ({ navigation }) => {
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
                                                     <SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>
-                                                    {/* <Path d={"M "+nodes[node][0]+" "+nodes[node][1]+" A 10 10 0 0 0 120 60"} stroke="black" /> */}
                                                 </G>
                                             </TouchableWithoutFeedback>
                                         )
@@ -366,23 +418,24 @@ const Home = ({ navigation }) => {
                     </View>
                 </ReactNativeZoomableView>
             </View>
-            <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isShowOnlyMap ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>setIsShowOnlyMap(!isShowOnlyMap)}
-                value={isShowOnlyMap}
-                style={styles.toggleSwitch}
-            />
-            <TouchableOpacity
+            {!isSelectionMode && <TouchableOpacity
                 style={[styles.save_button,styles.flexRow,styles.alignCenter]}
+                onPress={()=>{setIsSelectionMode(true);setIsSelectingOwnNode(true)}}
             >
                 <Icon name="exclamation-triangle" size={20} color="white"/>
                 <Text style={[styles.marginLeft8,styles.save_button_text]}>Save Me</Text>
-            </TouchableOpacity>
-            <View style={styles.fire_selection_container}>
-
-            </View>
+            </TouchableOpacity>}
+            {isSelectionMode && <View style={styles.fire_selection_container}>
+                <View>
+                    <Text>Tap Your Nearest Node</Text>
+                    <TouchableOpacity onPress={()=>setIsSelectingOwnNode(false)}>
+                        <Icon name="exclamation-triangle" size={20} color="green"/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>getNearestRefugePath()}>
+                        <Icon name="exclamation-triangle" size={20} color="green"/>
+                    </TouchableOpacity>
+                </View>
+            </View>}
         </Container>
     )
 }
