@@ -26,6 +26,26 @@ const styles = StyleSheet.create({
         top: Spacing.SCALE_50,
         right: Spacing.SCALE_20,
         zIndex: 999
+    },
+    fire_selection_container: {
+        position: 'absolute',
+        bottom: Spacing.SCALE_50,
+        right: Spacing.SCALE_20,
+        zIndex: 999
+    },
+    save_button: {
+        backgroundColor: 'tomato',
+        padding: Spacing.SCALE_10,
+        paddingHorizontal: Spacing.SCALE_25,
+        borderRadius: 25,
+        position: 'absolute',
+        bottom: Spacing.SCALE_25,
+        alignSelf: 'center',
+        zIndex: 999
+    },
+    save_button_text: {
+        color: 'white',
+        fontWeight: 'bold'
     }
 });
 

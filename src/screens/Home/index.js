@@ -4,7 +4,8 @@ import {
     Image,
     Text,
     TouchableWithoutFeedback,
-    Switch
+    Switch,
+    TouchableOpacity
 } from 'react-native';
 import style from './style'
 import { map } from 'src/assets'
@@ -34,13 +35,18 @@ import Svg, {
     Text as SVGText
 } from 'react-native-svg'
 import { Mixins, Spacing, Typography } from 'src/styles'
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Toast } from 'src/components'
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView'
 import FindShortestPath from './shortestPath'
 
 const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
-    const [isShowOnlyMap, setIsShowOnlyMap] = useState(false)
+    const [isShowOnlyMap, setIsShowOnlyMap] = useState(true)
+    const [isSelectingOwnNode, setIsSelectingOwnNode] = useState(false)
+    const [isSelectingFireNode, setIsSelectingFireNode] = useState(false)
+    const [isSelectionMode, setIsSelectionMode] = useState(false)
+    const [selectedNode, setselectedNode] = useState({own: null,fire: null})
 
     const refugeChambers = [ '4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39' ]
 
@@ -182,14 +188,6 @@ const Home = ({ navigation }) => {
 
     return (
         <Container isTransparentStatusBar={false}>
-            <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isShowOnlyMap ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={()=>setIsShowOnlyMap(!isShowOnlyMap)}
-                value={isShowOnlyMap}
-                style={styles.toggleSwitch}
-            />
             <View style={[styles.flex1,styles.centerAll]}>
             <ReactNativeZoomableView
                 maxZoom={1.5}
@@ -213,6 +211,20 @@ const Home = ({ navigation }) => {
                                 d="M 0,3 L 6,3 M 3,0 L 3,6"
                                 stroke="#10772C"
                                 strokeWidth="2.5"
+                                />
+                            </G>
+                            <G id="mypoint">
+                                <Path
+                                d="M16 0c-5.523 0-10 4.477-10 10 0 10 10 22 10 22s10-12 10-22c0-5.523-4.477-10-10-10zM16 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
+                                stroke="#ba2710"
+                                strokeWidth="3"
+                                />
+                            </G>
+                            <G id="firepoint">
+                                <Path
+                                d="M10.031 32c-2.133-4.438-0.997-6.981 0.642-9.376 1.795-2.624 2.258-5.221 2.258-5.221s1.411 1.834 0.847 4.703c2.493-2.775 2.963-7.196 2.587-8.889 5.635 3.938 8.043 12.464 4.798 18.783 17.262-9.767 4.294-24.38 2.036-26.027 0.753 1.646 0.895 4.433-0.625 5.785-2.573-9.759-8.937-11.759-8.937-11.759 0.753 5.033-2.728 10.536-6.084 14.648-0.118-2.007-0.243-3.392-1.298-5.312-0.237 3.646-3.023 6.617-3.777 10.27-1.022 4.946 0.765 8.568 7.555 12.394z"
+                                stroke="#fa9400"
+                                strokeWidth="3"
                                 />
                             </G>
                         </Defs>
@@ -309,12 +321,15 @@ const Home = ({ navigation }) => {
                                         <G>
                                             <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                             <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                            <SVGText x={nodes[node][0]} y={nodes[node][1]} text-anchor="middle" stroke="#51c5cf" stroke-width="2px" dy="5" dx="5" fontSize="10px">{node}</SVGText>
+                                            <SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>
+                                            {/* <Path d={"M "+nodes[node][0]+" "+nodes[node][1]+" A 10 10 0 0 0 120 60"} stroke="black" /> */}
                                         </G>
                                     </TouchableWithoutFeedback>
                                 )
                             })
                         }
+                        {selectedNode.own && <Use href="#mypoint" x={nodes[selectedNode.own][0]-16} y={nodes[selectedNode.own][1]-30} />}
+                        {selectedNode.fire && <Use href="#firepoint" x={nodes[selectedNode.fire][0]-17} y={nodes[selectedNode.fire][1]-25} />}
 
                         <Use href="#refugeChamber" x="255" y="330" />
                         <Use href="#refugeChamber" x="231" y="273" />
@@ -346,6 +361,23 @@ const Home = ({ navigation }) => {
                 */}
                 </View>
             </ReactNativeZoomableView>
+            </View>
+            <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isShowOnlyMap ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={()=>setIsShowOnlyMap(!isShowOnlyMap)}
+                value={isShowOnlyMap}
+                style={styles.toggleSwitch}
+            />
+            <TouchableOpacity
+                style={[styles.save_button,styles.flexRow,styles.alignCenter]}
+            >
+                <Icon name="exclamation-triangle" size={20} color="white"/>
+                <Text style={[styles.marginLeft8,styles.save_button_text]}>Save Me</Text>
+            </TouchableOpacity>
+            <View style={styles.fire_selection_container}>
+
             </View>
         </Container>
     )
