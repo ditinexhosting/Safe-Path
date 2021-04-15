@@ -21,7 +21,13 @@ const styles = StyleSheet.create({
     svg: {
         position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 99
     },
-    toggleSwitch: {
+    switchView:{
+        fontWeight: 'bold',
+        fontSize: Typography.FONT_SIZE_18
+    },
+    toggleSwitchContainer: {
+        alignItems: 'center',
+        flexDirection: 'row',
         position: 'absolute',
         top: Spacing.SCALE_50,
         right: Spacing.SCALE_20,

@@ -48,7 +48,7 @@ const Home = ({ navigation }) => {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedNode, setselectedNode] = useState({own: null,fire: null})
 
-    const refugeChambers = [ '4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39' ]
+    const refugeChambers = ['4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39']
 
     const nodes = {
         '1': [328.5, 477],
@@ -182,185 +182,189 @@ const Home = ({ navigation }) => {
     }
 
     const onNodePress = (node) => {
-        const shortestPath = FindShortestPath(graph,node,refugeChambers[0])
+        const shortestPath = FindShortestPath(graph, node, refugeChambers[0])
         return Toast.show({ type: 'success', message: 'Node : ' + node + '\nPath to refuge chamber : ' + shortestPath.path.join(' > ') })
     }
 
     return (
         <Container isTransparentStatusBar={false}>
-            <View style={[styles.flex1,styles.centerAll]}>
-            <ReactNativeZoomableView
-                maxZoom={1.5}
-                minZoom={0.5}
-                zoomStep={0.5}
-                initialZoom={1}
-                bindToBorders={true}
-                onZoomAfter={null}
-            >
+            <View style={styles.toggleSwitchContainer}>
+                <Text style={styles.switchView}>{isShowOnlyMap ? 'Node View' : 'Map View'}</Text>
+                <Switch
+                    trackColor={{ false: Colors.grey, true: Colors.secondary_very_light }}
+                    thumbColor={isShowOnlyMap ? Colors.primary : Colors.muted_text}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={() => setIsShowOnlyMap(!isShowOnlyMap)}
+                    value={isShowOnlyMap}
+                    style={styles.marginLeft5}
+                />
+            </View>
+            <View style={[styles.flex1, styles.centerAll]}>
+                <ReactNativeZoomableView
+                    maxZoom={1.5}
+                    minZoom={0.5}
+                    zoomStep={0.5}
+                    initialZoom={1}
+                    bindToBorders={true}
+                    onZoomAfter={null}
+                >
 
-                <View style={styles.container}>
-                    <Image
-                        style={styles.logo}
-                        source={map}
-                    />
-                    {isShowOnlyMap &&
-                    <Svg height="100%" width="100%" viewBox="0 0 350 600">
-                        <Defs>
-                            <G id="refugeChamber">
+                    <View style={styles.container}>
+                        <Image
+                            style={styles.logo}
+                            source={map}
+                        />
+                        {isShowOnlyMap &&
+                            <Svg height="100%" width="100%" viewBox="0 0 350 600">
+                                <Defs>
+                                    <G id="mypoint">
+                                        <Path
+                                        d="M16 0c-5.523 0-10 4.477-10 10 0 10 10 22 10 22s10-12 10-22c0-5.523-4.477-10-10-10zM16 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
+                                        stroke="#ba2710"
+                                        strokeWidth="3"
+                                        />
+                                    </G>
+                                    <G id="firepoint">
+                                        <Path
+                                        d="M10.031 32c-2.133-4.438-0.997-6.981 0.642-9.376 1.795-2.624 2.258-5.221 2.258-5.221s1.411 1.834 0.847 4.703c2.493-2.775 2.963-7.196 2.587-8.889 5.635 3.938 8.043 12.464 4.798 18.783 17.262-9.767 4.294-24.38 2.036-26.027 0.753 1.646 0.895 4.433-0.625 5.785-2.573-9.759-8.937-11.759-8.937-11.759 0.753 5.033-2.728 10.536-6.084 14.648-0.118-2.007-0.243-3.392-1.298-5.312-0.237 3.646-3.023 6.617-3.777 10.27-1.022 4.946 0.765 8.568 7.555 12.394z"
+                                        stroke="#fa9400"
+                                        strokeWidth="3"
+                                        />
+                                    </G>
+                                </Defs>
                                 <Path
-                                d="M 0,3 L 6,3 M 3,0 L 3,6"
-                                stroke="#10772C"
-                                strokeWidth="2.5"
+                                    d={`
+                                    ${paths['3_13']}
+                                    ${paths['13_14']}
+                                    ${paths['14_15']}
+                                    ${paths['15_16']}
+                                    ${paths['16_17']}
+                                    ${paths['14_18']}
+                                    `}
+                                            stroke="#F42C71" //Pink
+                                            strokeWidth="1.1"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['1_2']}
+                                    ${paths['2_3']}
+                                    ${paths['3_4']}
+                                    ${paths['4_5']}
+                                    ${paths['5_6']}
+                                    ${paths['6_7']}
+                                    ${paths['7_8']}
+                                    ${paths['8_9']}
+                                    ${paths['9_10']}
+                                    ${paths['10_11']}
+                                    ${paths['11_12']}
+                                    `}
+                                            stroke="black" //Black
+                                            strokeWidth="1.5"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['18_19']}
+                                    `}
+                                            stroke="#A56EA6" //Violet
+                                            strokeWidth="1.1"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['5_20']}
+                                    ${paths['7_21']}
+                                    `}
+                                            stroke="#61BFB1" //Greenish
+                                            strokeWidth="1.1"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['8_22']}
+                                    ${paths['22_23']}
+                                    ${paths['23_24']}
+                                    ${paths['24_25']}
+                                    `}
+                                            stroke="#8D77FE" //Purple
+                                            strokeWidth="1.5"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['24_26']}
+                                    ${paths['26_27']}
+                                    ${paths['27_28']}
+                                    ${paths['28_29']}
+                                    ${paths['29_30']}
+                                    ${paths['30_31']}
+                                    ${paths['29_32']}
+                                    `}
+                                            stroke="#B67734" //Orange
+                                            strokeWidth="1.5"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['32_33']}
+                                    ${paths['33_34']}
+                                    ${paths['34_35']}
+                                    ${paths['35_36']}
+                                    ${paths['36_37']}
+                                    `}
+                                            stroke="#42A0C4" //Blue
+                                            strokeWidth="1.5"
+                                        />
+                                        <Path
+                                            d={`
+                                    ${paths['37_38']}
+                                    ${paths['38_39']}
+                                    `}
+                                    stroke="#FFD000" //Yellow
+                                    strokeWidth="1.5"
                                 />
-                            </G>
-                            <G id="mypoint">
-                                <Path
-                                d="M16 0c-5.523 0-10 4.477-10 10 0 10 10 22 10 22s10-12 10-22c0-5.523-4.477-10-10-10zM16 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
-                                stroke="#ba2710"
-                                strokeWidth="3"
-                                />
-                            </G>
-                            <G id="firepoint">
-                                <Path
-                                d="M10.031 32c-2.133-4.438-0.997-6.981 0.642-9.376 1.795-2.624 2.258-5.221 2.258-5.221s1.411 1.834 0.847 4.703c2.493-2.775 2.963-7.196 2.587-8.889 5.635 3.938 8.043 12.464 4.798 18.783 17.262-9.767 4.294-24.38 2.036-26.027 0.753 1.646 0.895 4.433-0.625 5.785-2.573-9.759-8.937-11.759-8.937-11.759 0.753 5.033-2.728 10.536-6.084 14.648-0.118-2.007-0.243-3.392-1.298-5.312-0.237 3.646-3.023 6.617-3.777 10.27-1.022 4.946 0.765 8.568 7.555 12.394z"
-                                stroke="#fa9400"
-                                strokeWidth="3"
-                                />
-                            </G>
-                        </Defs>
-                        <Path
-                            d={`
-                            ${paths['3_13']}
-                            ${paths['13_14']}
-                            ${paths['14_15']}
-                            ${paths['15_16']}
-                            ${paths['16_17']}
-                            ${paths['14_18']}
-                            `}
-                            stroke="#F42C71" //Pink
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
-                            ${paths['1_2']}
-                            ${paths['2_3']}
-                            ${paths['3_4']}
-                            ${paths['4_5']}
-                            ${paths['5_6']}
-                            ${paths['6_7']}
-                            ${paths['7_8']}
-                            ${paths['8_9']}
-                            ${paths['9_10']}
-                            ${paths['10_11']}
-                            ${paths['11_12']}
-                            `}
-                            stroke="black" //Black
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
-                            ${paths['18_19']}
-                            `}
-                            stroke="#A56EA6" //Violet
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
-                            ${paths['5_20']}
-                            ${paths['7_21']}
-                            `}
-                            stroke="#61BFB1" //Greenish
-                            strokeWidth="1.1"
-                        />
-                        <Path
-                            d={`
-                            ${paths['8_22']}
-                            ${paths['22_23']}
-                            ${paths['23_24']}
-                            ${paths['24_25']}
-                            `}
-                            stroke="#8D77FE" //Purple
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
-                            ${paths['24_26']}
-                            ${paths['26_27']}
-                            ${paths['27_28']}
-                            ${paths['28_29']}
-                            ${paths['29_30']}
-                            ${paths['30_31']}
-                            ${paths['29_32']}
-                            `}
-                            stroke="#B67734" //Orange
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
-                            ${paths['32_33']}
-                            ${paths['33_34']}
-                            ${paths['34_35']}
-                            ${paths['35_36']}
-                            ${paths['36_37']}
-                            `}
-                            stroke="#42A0C4" //Blue
-                            strokeWidth="1.5"
-                        />
-                        <Path
-                            d={`
-                            ${paths['37_38']}
-                            ${paths['38_39']}
-                            `}
-                            stroke="#FFD000" //Yellow
-                            strokeWidth="1.5"
-                        />
-                        {
-                            Object.keys(nodes).map(node => {
-                                return (
-                                    <TouchableWithoutFeedback key={node} onPress={() => onNodePress(node)} >
-                                        <G>
-                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
-                                            <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                            <SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>
-                                            {/* <Path d={"M "+nodes[node][0]+" "+nodes[node][1]+" A 10 10 0 0 0 120 60"} stroke="black" /> */}
-                                        </G>
-                                    </TouchableWithoutFeedback>
-                                )
-                            })
+                                {
+                                    Object.keys(nodes).map(node => {
+                                        return (
+                                            <TouchableWithoutFeedback key={node} onPress={() => onNodePress(node)} >
+                                                <G>
+                                                    <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
+                                                    <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
+                                                    <SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>
+                                                    {/* <Path d={"M "+nodes[node][0]+" "+nodes[node][1]+" A 10 10 0 0 0 120 60"} stroke="black" /> */}
+                                                </G>
+                                            </TouchableWithoutFeedback>
+                                        )
+                                    })
+                                }
+                                {selectedNode.own && <Use href="#mypoint" x={nodes[selectedNode.own][0]-16} y={nodes[selectedNode.own][1]-30} />}
+                                {selectedNode.fire && <Use href="#firepoint" x={nodes[selectedNode.fire][0]-17} y={nodes[selectedNode.fire][1]-25} />}
+
+                                <Use href="#refugeChamber" x="255" y="330" />
+                                <Use href="#refugeChamber" x="231" y="273" />
+                                <Use href="#refugeChamber" x="227" y="215" />
+                                <Use href="#refugeChamber" x="190" y="168.5" />
+                                <Use href="#refugeChamber" x="161" y="214.5" />
+                                <Use href="#refugeChamber" x="36" y="357" />
+                                <Use href="#refugeChamber" x="28" y="366" />
+                                <Use href="#refugeChamber" x="44" y="348" />
+                                <Use href="#refugeChamber" x="56" y="336" />
+                                <Use href="#refugeChamber" x="111" y="155" />
+                                <Use href="#refugeChamber" x="137" y="120" />
+                                <Use href="#refugeChamber" x="70" y="127" />
+                                <Use href="#refugeChamber" x="81" y="162" />
+                                <Use href="#refugeChamber" x="101" y="400" />
+                                <Use href="#refugeChamber" x="71" y="431" />
+                                <Use href="#refugeChamber" x="62" y="396" />
+                                <Use href="#refugeChamber" x="40" y="470" />
+                                <Use href="#refugeChamber" x="42" y="483" />
+                                <Use href="#refugeChamber" x="44" y="455" />
+                                <Use href="#refugeChamber" x="202" y="298" />
+                                <Use href="#refugeChamber" x="122" y="295" />
+                                <Use href="#refugeChamber" x="145" y="308" />
+                                <Use href="#refugeChamber" x="222" y="455" />
+                                <Use href="#refugeChamber" x="270" y="502" />
+                            </Svg>
                         }
-                        {selectedNode.own && <Use href="#mypoint" x={nodes[selectedNode.own][0]-16} y={nodes[selectedNode.own][1]-30} />}
-                        {selectedNode.fire && <Use href="#firepoint" x={nodes[selectedNode.fire][0]-17} y={nodes[selectedNode.fire][1]-25} />}
-
-                        <Use href="#refugeChamber" x="255" y="330" />
-                        <Use href="#refugeChamber" x="231" y="273" />
-                        <Use href="#refugeChamber" x="227" y="215" />
-                        <Use href="#refugeChamber" x="190" y="168.5" />
-                        <Use href="#refugeChamber" x="161" y="214.5" />
-                        <Use href="#refugeChamber" x="36" y="357" />
-                        <Use href="#refugeChamber" x="28" y="366" />
-                        <Use href="#refugeChamber" x="44" y="348" />
-                        <Use href="#refugeChamber" x="56" y="336" />
-                        <Use href="#refugeChamber" x="111" y="155" />
-                        <Use href="#refugeChamber" x="137" y="120" />
-                        <Use href="#refugeChamber" x="70" y="127" />
-                        <Use href="#refugeChamber" x="81" y="162" />
-                        <Use href="#refugeChamber" x="101" y="400" />
-                        <Use href="#refugeChamber" x="71" y="431" />
-                        <Use href="#refugeChamber" x="62" y="396" />
-                        <Use href="#refugeChamber" x="40" y="470" />
-                        <Use href="#refugeChamber" x="42" y="483" />
-                        <Use href="#refugeChamber" x="44" y="455" />
-                        <Use href="#refugeChamber" x="202" y="298" />
-                        <Use href="#refugeChamber" x="122" y="295" />
-                        <Use href="#refugeChamber" x="145" y="308" />
-                        <Use href="#refugeChamber" x="222" y="455" />
-                        <Use href="#refugeChamber" x="270" y="502" />
-                    </Svg>
-                    }
-                    {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
+                        {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
                 */}
-                </View>
-            </ReactNativeZoomableView>
+                    </View>
+                </ReactNativeZoomableView>
             </View>
             <Switch
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
