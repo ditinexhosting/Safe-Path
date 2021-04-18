@@ -135,8 +135,8 @@ const Home = ({ navigation }) => {
         '29_30': 'M 48 433 L 58 396',
         '30_31': 'M 58 396 L 81 311',
         '29_32': 'M 48 433 L 35 485',
-        '4_37': '',
-        '33_37': 'M 267 330 S 264,314 277.5,320 S 294.5,340 293,340 L 293,350 L 284,362 M 280,368 S 274,380 255,400 C 245,407 230,410 220,390 C 220,390 217,385 213,370 L 196 300',
+        '4_37': 'M 267 330 S 264,314 277.5,320 S 294.5,340 293,340 L 293,350 L 284,362 M 280,368 S 274,380 255,400 C 245,407 230,410 220,390',
+        '33_37': 'M 220,390 C 220,390 217,385 213,370 L 196 300',
         '33_34': 'M 196 300 L 190 272',
         '34_35': 'M 190 272 L 174 205 M 172 197 L 163 160',
         '34_36': 'M 190 272 L 135 313',
@@ -393,7 +393,7 @@ const Home = ({ navigation }) => {
                                                 <G>
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                                    {/*<SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>*/}
+                                                    {<SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>}
                                                 </G>
                                             </TouchableWithoutFeedback>
                                         )

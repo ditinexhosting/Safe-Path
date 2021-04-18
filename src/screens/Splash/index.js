@@ -5,7 +5,6 @@ import {
     Text
 } from 'react-native';
 import style from './style'
-import { logo } from 'src/assets'
 import { Container } from 'src/components'
 import { useTheme } from 'src/hooks'
 
