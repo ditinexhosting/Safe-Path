@@ -7,8 +7,9 @@ import {
     Switch,
     TouchableOpacity
 } from 'react-native';
+import Modal from 'react-native-modal';
 import style from './style'
-import { map } from 'src/assets'
+import { map, key_map } from 'src/assets'
 import { Container } from 'src/components'
 import { useTheme } from 'src/hooks'
 import Svg, {
@@ -39,15 +40,16 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Toast } from 'src/components'
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView'
 import FindShortestPath from './shortestPath'
+import BottomPopUp from './bottomPopUp'
 
 const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
     const [isShowOnlyMap, setIsShowOnlyMap] = useState(true)
     const [isSelectingOwnNode, setIsSelectingOwnNode] = useState(false)
-    const [isSelectingFireNode, setIsSelectingFireNode] = useState(false)
-    const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedNode, setselectedNode] = useState({own: null,fire: null})
     const [shortestChamberPath, setShortestChamberPath] = useState(null)
+    const [modalVisible, setModalVisible] = useState(false)
+    const [keymapModalVisible, setKeymapModalVisible] = useState(false)
 
     const refugeChambers = ['4', '16', '7', '8', '9', '11', '12', '22', '23', '25', '26', '27', '28', '30', '32', '33', '36', '38', '39']
 
@@ -185,20 +187,39 @@ const Home = ({ navigation }) => {
     }
 
     const onNodePress = (node) => {
-        console.log(node)
-        if(isSelectionMode && isSelectingOwnNode)
+        if(isSelectingOwnNode)
             setselectedNode({...selectedNode,own: node})
-        else if(isSelectionMode && !isSelectingOwnNode)
+        else if(!isSelectingOwnNode)
             setselectedNode({...selectedNode,fire: node})
-        else
-        {}
+    }
+
+    const modalNext=()=>{
+        if(isSelectingOwnNode && selectedNode.own)
+            setIsSelectingOwnNode(false)
+        else if(!isSelectingOwnNode && selectedNode.fire)
+            {
+                getNearestRefugePath()
+                setModalVisible(false)
+            }
+        else Toast.show({ type: 'error', message: 'You must select the nodes!' })
+    }
+
+    const modalReset=()=>{
+        setIsSelectingOwnNode(true)
+        setselectedNode({own: null,fire: null})
+        setShortestChamberPath(null)
     }
 
     const getNearestRefugePath=()=>{
-        const nonFireGraph = graph
-        nonFireGraph[selectedNode.fire] = null
-        if(nonFireGraph[selectedNode.own][selectedNode.fire])
-            nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
+        var nonFireGraph = graph
+        if(refugeChambers.includes(selectedNode.own))
+            return Toast.show({ type: 'success', message: 'You are already near a Refuge Camp!' })
+        if(selectedNode.own != selectedNode.fire)
+        {
+            nonFireGraph[selectedNode.fire] = null
+            if(nonFireGraph[selectedNode.own][selectedNode.fire])
+                nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
+        }
         const ownNode = selectedNode.own
         var shortestChamber = null
         // console.log(nonFireGraph)
@@ -209,13 +230,13 @@ const Home = ({ navigation }) => {
             if(!shortestChamber || shortestChamber.distance>shortestPath.distance)
                 shortestChamber = shortestPath
         }
-        console.log(shortestChamber)
+        // console.log(shortestChamber)
         // // make path
         var pathSvg = ""
         var p;
         for(var j=0;j<shortestChamber.path.length-1;j++)
         {
-            if(shortestChamber.path[j]<shortestChamber.path[j+1])
+            if(parseInt(shortestChamber.path[j])<parseInt(shortestChamber.path[j+1]))
                 p = shortestChamber.path[j]+'_'+shortestChamber.path[j+1]
             else
                 p = shortestChamber.path[j+1]+'_'+shortestChamber.path[j]
@@ -227,16 +248,21 @@ const Home = ({ navigation }) => {
 
     return (
         <Container isTransparentStatusBar={false}>
-            <View style={styles.toggleSwitchContainer}>
-                <Text style={styles.switchView}>{isShowOnlyMap ? 'Node View' : 'Map View'}</Text>
-                <Switch
-                    trackColor={{ false: Colors.grey, true: Colors.secondary_very_light }}
-                    thumbColor={isShowOnlyMap ? Colors.primary : Colors.muted_text}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={() => setIsShowOnlyMap(!isShowOnlyMap)}
-                    value={isShowOnlyMap}
-                    style={styles.marginLeft5}
-                />
+            <View style={styles.topContainer}>
+                <TouchableOpacity onPress={()=>setKeymapModalVisible(true)}>
+                    <Icon name="info-circle" size={30} color="#398FFF"/>
+                </TouchableOpacity>
+                <View style={[styles.toggleSwitchContainer]}>
+                    <Text style={styles.switchView}>{isShowOnlyMap ? 'Node View' : 'Map View'}</Text>
+                    <Switch
+                        trackColor={{ false: Colors.grey, true: Colors.secondary_very_light }}
+                        thumbColor={isShowOnlyMap ? Colors.primary : Colors.muted_text}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => setIsShowOnlyMap(!isShowOnlyMap)}
+                        value={isShowOnlyMap}
+                        style={styles.marginLeft5}
+                    />
+                </View>
             </View>
             <View style={[styles.flex1, styles.centerAll,{overflow: 'hidden'}]}>
                 <ReactNativeZoomableView
@@ -368,7 +394,7 @@ const Home = ({ navigation }) => {
                                         />
                                         <Path
                                             d={shortestChamberPath}
-                                            stroke="#4BB543" //Yellow
+                                            stroke="#4BB543"
                                             strokeWidth="4"
                                         />
                                 {
@@ -418,24 +444,28 @@ const Home = ({ navigation }) => {
                     </View>
                 </ReactNativeZoomableView>
             </View>
-            {!isSelectionMode && <TouchableOpacity
+            {!modalVisible && <TouchableOpacity
                 style={[styles.save_button,styles.flexRow,styles.alignCenter]}
-                onPress={()=>{setIsSelectionMode(true);setIsSelectingOwnNode(true)}}
+                onPress={()=>{setIsSelectingOwnNode(true);setModalVisible(true);modalReset()}}
             >
                 <Icon name="exclamation-triangle" size={20} color="white"/>
                 <Text style={[styles.marginLeft8,styles.save_button_text]}>Save Me</Text>
             </TouchableOpacity>}
-            {isSelectionMode && <View style={styles.fire_selection_container}>
+            <BottomPopUp _this={{modalVisible,setModalVisible,isSelectingOwnNode,modalNext,modalReset}} />
+            <Modal
+                style={styles.keymap_modal}
+                onBackButtonPress={()=>setKeymapModalVisible(false)}
+                isVisible={keymapModalVisible}>
                 <View>
-                    <Text>Tap Your Nearest Node</Text>
-                    <TouchableOpacity onPress={()=>setIsSelectingOwnNode(false)}>
-                        <Icon name="exclamation-triangle" size={20} color="green"/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>getNearestRefugePath()}>
-                        <Icon name="exclamation-triangle" size={20} color="green"/>
+                    <Image source={key_map}/>
+                    <TouchableOpacity
+                        style={[styles.close_button]}
+                        onPress={()=>{setKeymapModalVisible(false)}}
+                    >
+                        <Icon name="times-circle" size={40} color="tomato"/>
                     </TouchableOpacity>
                 </View>
-            </View>}
+            </Modal>
         </Container>
     )
 }

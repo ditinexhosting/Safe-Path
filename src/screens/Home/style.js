@@ -28,10 +28,16 @@ const styles = StyleSheet.create({
     toggleSwitchContainer: {
         alignItems: 'center',
         flexDirection: 'row',
+    },
+    topContainer: {
+        flexDirection: 'row',
         position: 'absolute',
         top: Spacing.SCALE_50,
-        right: Spacing.SCALE_20,
-        zIndex: 999
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        zIndex: 999,
+        width: Mixins.DEVICE_WIDTH,
+        paddingLeft: Mixins.scaleSize(10)
     },
     fire_selection_container: {
         height: Mixins.scaleHeight(100),
@@ -51,6 +57,54 @@ const styles = StyleSheet.create({
     save_button_text: {
         color: 'white',
         fontWeight: 'bold'
+    },
+
+    modal: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        margin: 0
+    },
+    popup: {
+        backgroundColor: '#f1f1f1',
+        width: Mixins.DEVICE_WIDTH,
+        height: Mixins.scaleHeight(80),
+        borderTopRightRadius: 10,
+        borderTopLeftRadius: 10,
+        overflow: 'hidden',
+        paddingHorizontal: Mixins.scaleSize(10),
+    },
+    nextButton: {
+        height: 45,
+        width: 45,
+        backgroundColor: '#000',
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    reset_button: {
+        height: 30,
+        width: 30,
+        backgroundColor: '#000',
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'flex-end'
+    },
+    popup_container_title: {
+        fontWeight: 'bold',
+        fontSize: Typography.FONT_SIZE_18
+    },
+    keymap_modal: {
+        flex: 1,
+        alignItems: 'center',
+        margin: 0
+    },
+    close_button: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        zIndex: 999
     }
 });
 
