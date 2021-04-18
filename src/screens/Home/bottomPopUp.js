@@ -17,6 +17,15 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 const BottomPopUp = ({ _this }) => {
     const [Colors, styles] = useTheme(style)
 
+    let selectedNode = 'No node selected.'
+    if(_this.isSelectingOwnNode){
+        if(_this.selectedNode.own)
+        selectedNode = _this.selectedNode.own
+    }else{
+        if(_this.selectedNode.fire)
+        selectedNode = _this.selectedNode.fire
+    }
+
     return (
         <Modal
             style={styles.modal}
@@ -30,15 +39,18 @@ const BottomPopUp = ({ _this }) => {
             backdropTransitionOutTiming={500}>
             <View style={[styles.popup,styles.paddingTop10]}>
                 <View style={[styles.flexRow,styles.spaceBetween,styles.alignCenter]}>
-                    {_this.isSelectingOwnNode && <Text style={styles.popup_container_title}>Tap On Your Near About Node</Text>}
-                    {!_this.isSelectingOwnNode && <Text style={styles.popup_container_title}>Tap On The Fire Node</Text>}
+                    {_this.isSelectingOwnNode && <Text style={styles.popup_container_title}>Tap your nearest node ...</Text>}
+                    {!_this.isSelectingOwnNode && <Text style={styles.popup_container_title}>Tap on the fire accident node ...</Text>}
                     <TouchableOpacity onPress={()=>_this.modalNext()} style={styles.nextButton}>
                         <Icon name="arrow-right" size={20} color="white"/>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={()=>_this.modalReset()} style={[styles.reset_button,styles.marginRight5,styles.marginTop5]}>
-                    <Icon name="sync-alt" size={15} color="white"/>
-                </TouchableOpacity>
+                <View style={[styles.flexRow,styles.spaceBetween,styles.alignCenter]}>
+                    <Text style={styles.popup_container_title}>Selected Node : {selectedNode}</Text>
+                    <TouchableOpacity onPress={()=>_this.modalReset()} style={[styles.reset_button,styles.marginRight5,styles.marginTop5]}>
+                        <Icon name="sync-alt" size={15} color="white"/>
+                    </TouchableOpacity>
+                </View>
             </View>
         </Modal>
     )

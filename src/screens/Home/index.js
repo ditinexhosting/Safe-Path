@@ -49,6 +49,7 @@ const Home = ({ navigation }) => {
     const [isSelectingOwnNode, setIsSelectingOwnNode] = useState(false)
     const [selectedNode, setselectedNode] = useState({ own: null, fire: null })
     const [shortestChamberPath, setShortestChamberPath] = useState(null)
+    const [shortestChamberRawData, setShortestRawData] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
     const [keymapModalVisible, setKeymapModalVisible] = useState(false)
 
@@ -190,7 +191,7 @@ const Home = ({ navigation }) => {
     const onNodePress = (node) => {
         if (isSelectingOwnNode)
             setselectedNode({ ...selectedNode, own: node })
-        else if (!isSelectingOwnNode)
+        else if (!isSelectingOwnNode && !shortestChamberPath)
             setselectedNode({ ...selectedNode, fire: node })
     }
 
@@ -208,6 +209,7 @@ const Home = ({ navigation }) => {
         setIsSelectingOwnNode(true)
         setselectedNode({ own: null, fire: null })
         setShortestChamberPath(null)
+        setShortestRawData(null)
     }
 
     const getNearestRefugePath = () => {
@@ -228,7 +230,7 @@ const Home = ({ navigation }) => {
             if (!shortestChamber || shortestChamber.distance > shortestPath.distance)
                 shortestChamber = shortestPath
         }
-        // console.log(shortestChamber)
+        setShortestRawData(shortestChamber)
         // // make path
         var pathSvg = ""
         var p;
@@ -237,7 +239,7 @@ const Home = ({ navigation }) => {
                 p = shortestChamber.path[j] + '_' + shortestChamber.path[j + 1]
             else
                 p = shortestChamber.path[j + 1] + '_' + shortestChamber.path[j]
-            console.log(p)
+            //console.log(p)
             pathSvg = pathSvg + paths[p.toString()]
         }
         setShortestChamberPath(pathSvg)
@@ -261,6 +263,10 @@ const Home = ({ navigation }) => {
                     />
                 </View>
             </View>
+            {shortestChamberRawData && <View style={styles.resultContainer}>
+                <Text style={styles.resultText}>Follow the green path to reach nearest and safest Refugee Chamber.</Text>
+                <Text style={styles.resultPath}>Path via node {shortestChamberRawData.path.join(' > ')}</Text>
+            </View>}
             <View style={[styles.flex1, styles.centerAll, { overflow: 'hidden' }]}>
                 <ReactNativeZoomableView
                     maxZoom={1.5}
@@ -408,7 +414,7 @@ const Home = ({ navigation }) => {
                                     y={nodes[selectedNode.fire][1] - 18}
                                     width={25}
                                     height={25}
-                                    //preserveAspectRatio="xMidYMid slice"
+                                    preserveAspectRatio="xMidYMid slice"
                                     opacity={1.0}
                                     href={fire}
                                     clipPath="url(#clip)"
@@ -440,11 +446,11 @@ const Home = ({ navigation }) => {
                                 <Use href="#refugeChamber" x="270" y="502" />
                             </Svg>
                         }
-                        {/*<SvgCss xml={xml} width="100%" height="100%" style={styles.svg} />
-                */}
+                        
                     </View>
                 </ReactNativeZoomableView>
             </View>
+            
             {!modalVisible && <TouchableOpacity
                 style={[styles.save_button, styles.flexRow, styles.alignCenter]}
                 onPress={() => { setIsSelectingOwnNode(true); setModalVisible(true); modalReset() }}
@@ -452,7 +458,8 @@ const Home = ({ navigation }) => {
                 <Icon name="exclamation-triangle" size={20} color="white" />
                 <Text style={[styles.marginLeft8, styles.save_button_text]}>Save Me</Text>
             </TouchableOpacity>}
-            <BottomPopUp _this={{ modalVisible, setModalVisible, isSelectingOwnNode, modalNext, modalReset }} />
+            
+            <BottomPopUp _this={{ modalVisible, setModalVisible, isSelectingOwnNode, modalNext, modalReset, selectedNode }} />
             <Modal
                 style={styles.keymap_modal}
                 onBackButtonPress={() => setKeymapModalVisible(false)}
@@ -463,7 +470,7 @@ const Home = ({ navigation }) => {
                         style={[styles.close_button]}
                         onPress={() => { setKeymapModalVisible(false) }}
                     >
-                        <Icon name="times-circle" size={40} color="tomato" />
+                        <Icon name="times-circle" size={40} color={Colors.primary} />
                     </TouchableOpacity>
                 </View>
             </Modal>

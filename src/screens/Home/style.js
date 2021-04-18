@@ -1,13 +1,13 @@
 import {
     StyleSheet,
 } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { Mixins, Spacing, Typography } from 'src/styles'
 
-const styles = StyleSheet.create({
+const styles = ({ Colors }) => (StyleSheet.create({
     container: {
         width: Mixins.scaleSize(350),
         height: Mixins.scaleSize(600),
-        position: 'relative'
     },
     logo:{
         resizeMode: 'stretch',
@@ -31,13 +31,13 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         flexDirection: 'row',
-        position: 'absolute',
-        top: Spacing.SCALE_50,
+        //position: 'absolute',
+        //top: Spacing.SCALE_50,
         justifyContent: 'space-between',
         alignItems: 'center',
-        zIndex: 999,
         width: Mixins.DEVICE_WIDTH,
-        paddingLeft: Mixins.scaleSize(10)
+        paddingHorizontal: Spacing.SCALE_10,
+        paddingTop: Spacing.SCALE_5
     },
     fire_selection_container: {
         height: Mixins.scaleHeight(100),
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         bottom: 0
     },
     save_button: {
-        backgroundColor: 'tomato',
+        backgroundColor: Colors.primary,
         padding: Spacing.SCALE_10,
         paddingHorizontal: Spacing.SCALE_25,
         borderRadius: 25,
@@ -105,7 +105,24 @@ const styles = StyleSheet.create({
         top: 0,
         right: 0,
         zIndex: 999
+    },
+    resultContainer:{
+        padding: Spacing.SCALE_10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    resultText:{
+        fontSize: Typography.FONT_SIZE_12,
+        color: Colors.primary,
+        textAlign: 'center'
+    },
+    resultPath:{
+        fontSize: Typography.FONT_SIZE_14,
+        color: Colors.primary_light,
+        fontWeight: 'bold',
+        textAlign: 'center'
     }
-});
+})
+);
 
 export default styles
