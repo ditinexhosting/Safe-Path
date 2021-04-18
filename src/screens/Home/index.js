@@ -239,7 +239,7 @@ const Home = ({ navigation }) => {
                 p = shortestChamber.path[j] + '_' + shortestChamber.path[j + 1]
             else
                 p = shortestChamber.path[j + 1] + '_' + shortestChamber.path[j]
-            //console.log(p)
+            console.log(p)
             pathSvg = pathSvg + paths[p.toString()]
         }
         setShortestChamberPath(pathSvg)
