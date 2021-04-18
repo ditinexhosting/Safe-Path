@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
-    Image,
     Text,
     TouchableWithoutFeedback,
     Switch,
+    Image as Image2,
     TouchableOpacity
 } from 'react-native';
 import Modal from 'react-native-modal';
 import style from './style'
-import { map, key_map } from 'src/assets'
+import { map, key_map, fire, worker } from 'src/assets'
 import { Container } from 'src/components'
 import { useTheme } from 'src/hooks'
 import Svg, {
@@ -33,6 +33,7 @@ import Svg, {
     ClipPath,
     Pattern,
     Mask,
+    Image,
     Text as SVGText
 } from 'react-native-svg'
 import { Mixins, Spacing, Typography } from 'src/styles'
@@ -46,7 +47,7 @@ const Home = ({ navigation }) => {
     const [Colors, styles] = useTheme(style)
     const [isShowOnlyMap, setIsShowOnlyMap] = useState(true)
     const [isSelectingOwnNode, setIsSelectingOwnNode] = useState(false)
-    const [selectedNode, setselectedNode] = useState({own: null,fire: null})
+    const [selectedNode, setselectedNode] = useState({ own: null, fire: null })
     const [shortestChamberPath, setShortestChamberPath] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
     const [keymapModalVisible, setKeymapModalVisible] = useState(false)
@@ -187,59 +188,55 @@ const Home = ({ navigation }) => {
     }
 
     const onNodePress = (node) => {
-        if(isSelectingOwnNode)
-            setselectedNode({...selectedNode,own: node})
-        else if(!isSelectingOwnNode)
-            setselectedNode({...selectedNode,fire: node})
+        if (isSelectingOwnNode)
+            setselectedNode({ ...selectedNode, own: node })
+        else if (!isSelectingOwnNode)
+            setselectedNode({ ...selectedNode, fire: node })
     }
 
-    const modalNext=()=>{
-        if(isSelectingOwnNode && selectedNode.own)
+    const modalNext = () => {
+        if (isSelectingOwnNode && selectedNode.own)
             setIsSelectingOwnNode(false)
-        else if(!isSelectingOwnNode && selectedNode.fire)
-            {
-                getNearestRefugePath()
-                setModalVisible(false)
-            }
+        else if (!isSelectingOwnNode && selectedNode.fire) {
+            getNearestRefugePath()
+            setModalVisible(false)
+        }
         else Toast.show({ type: 'error', message: 'You must select the nodes!' })
     }
 
-    const modalReset=()=>{
+    const modalReset = () => {
         setIsSelectingOwnNode(true)
-        setselectedNode({own: null,fire: null})
+        setselectedNode({ own: null, fire: null })
         setShortestChamberPath(null)
     }
 
-    const getNearestRefugePath=()=>{
+    const getNearestRefugePath = () => {
         var nonFireGraph = graph
-        if(refugeChambers.includes(selectedNode.own))
+        if (refugeChambers.includes(selectedNode.own))
             return Toast.show({ type: 'success', message: 'You are already near a Refuge Camp!' })
-        if(selectedNode.own != selectedNode.fire)
-        {
+        if (selectedNode.own != selectedNode.fire) {
             nonFireGraph[selectedNode.fire] = null
-            if(nonFireGraph[selectedNode.own][selectedNode.fire])
+            if (nonFireGraph[selectedNode.own][selectedNode.fire])
                 nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
         }
         const ownNode = selectedNode.own
         var shortestChamber = null
         // console.log(nonFireGraph)
-        for(var i=0;i<refugeChambers.length;i++)
-        {
+        for (var i = 0; i < refugeChambers.length; i++) {
             const shortestPath = FindShortestPath(nonFireGraph, ownNode, refugeChambers[i])
             // console.log(shortestPath, i)
-            if(!shortestChamber || shortestChamber.distance>shortestPath.distance)
+            if (!shortestChamber || shortestChamber.distance > shortestPath.distance)
                 shortestChamber = shortestPath
         }
         // console.log(shortestChamber)
         // // make path
         var pathSvg = ""
         var p;
-        for(var j=0;j<shortestChamber.path.length-1;j++)
-        {
-            if(parseInt(shortestChamber.path[j])<parseInt(shortestChamber.path[j+1]))
-                p = shortestChamber.path[j]+'_'+shortestChamber.path[j+1]
+        for (var j = 0; j < shortestChamber.path.length - 1; j++) {
+            if (parseInt(shortestChamber.path[j]) < parseInt(shortestChamber.path[j + 1]))
+                p = shortestChamber.path[j] + '_' + shortestChamber.path[j + 1]
             else
-                p = shortestChamber.path[j+1]+'_'+shortestChamber.path[j]
+                p = shortestChamber.path[j + 1] + '_' + shortestChamber.path[j]
             console.log(p)
             pathSvg = pathSvg + paths[p.toString()]
         }
@@ -249,8 +246,8 @@ const Home = ({ navigation }) => {
     return (
         <Container isTransparentStatusBar={false}>
             <View style={styles.topContainer}>
-                <TouchableOpacity onPress={()=>setKeymapModalVisible(true)}>
-                    <Icon name="info-circle" size={30} color="#398FFF"/>
+                <TouchableOpacity onPress={() => setKeymapModalVisible(true)}>
+                    <Icon name="info-circle" size={30} color="#398FFF" />
                 </TouchableOpacity>
                 <View style={[styles.toggleSwitchContainer]}>
                     <Text style={styles.switchView}>{isShowOnlyMap ? 'Node View' : 'Map View'}</Text>
@@ -264,7 +261,7 @@ const Home = ({ navigation }) => {
                     />
                 </View>
             </View>
-            <View style={[styles.flex1, styles.centerAll,{overflow: 'hidden'}]}>
+            <View style={[styles.flex1, styles.centerAll, { overflow: 'hidden' }]}>
                 <ReactNativeZoomableView
                     maxZoom={1.5}
                     minZoom={0.5}
@@ -275,7 +272,7 @@ const Home = ({ navigation }) => {
                 >
 
                     <View style={styles.container}>
-                        <Image
+                        <Image2
                             style={styles.logo}
                             source={map}
                         />
@@ -287,20 +284,6 @@ const Home = ({ navigation }) => {
                                             d="M 0,3 L 6,3 M 3,0 L 3,6"
                                             stroke="#10772C"
                                             strokeWidth="2.5"
-                                        />
-                                    </G>
-                                    <G id="mypoint">
-                                        <Path
-                                        d="M16 0c-5.523 0-10 4.477-10 10 0 10 10 22 10 22s10-12 10-22c0-5.523-4.477-10-10-10zM16 16c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
-                                        stroke="#ba2710"
-                                        strokeWidth="3"
-                                        />
-                                    </G>
-                                    <G id="firepoint">
-                                        <Path
-                                        d="M10.031 32c-2.133-4.438-0.997-6.981 0.642-9.376 1.795-2.624 2.258-5.221 2.258-5.221s1.411 1.834 0.847 4.703c2.493-2.775 2.963-7.196 2.587-8.889 5.635 3.938 8.043 12.464 4.798 18.783 17.262-9.767 4.294-24.38 2.036-26.027 0.753 1.646 0.895 4.433-0.625 5.785-2.573-9.759-8.937-11.759-8.937-11.759 0.753 5.033-2.728 10.536-6.084 14.648-0.118-2.007-0.243-3.392-1.298-5.312-0.237 3.646-3.023 6.617-3.777 10.27-1.022 4.946 0.765 8.568 7.555 12.394z"
-                                        stroke="#fa9400"
-                                        strokeWidth="3"
                                         />
                                     </G>
                                 </Defs>
@@ -330,37 +313,37 @@ const Home = ({ navigation }) => {
                                         ${paths['10_11']}
                                         ${paths['11_12']}
                                     `}
-                                        stroke="black" //Black
-                                        strokeWidth="1.5"
-                                    />
-                                        <Path
-                                            d={`
+                                    stroke="black" //Black
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['18_19']}
                                             `}
-                                            stroke="#A56EA6" //Violet
-                                            strokeWidth="1.1"
-                                        />
-                                        <Path
-                                            d={`
+                                    stroke="#A56EA6" //Violet
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['5_20']}
                                                 ${paths['7_21']}
                                             `}
-                                            stroke="#61BFB1" //Greenish
-                                            strokeWidth="1.1"
-                                        />
-                                        <Path
-                                            d={`
+                                    stroke="#61BFB1" //Greenish
+                                    strokeWidth="1.1"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['8_35']}
                                                 ${paths['22_35']}
                                                 ${paths['22_23']}
                                                 ${paths['22_24']}
                                                 ${paths['24_25']}
                                             `}
-                                            stroke="#8D77FE" //Purple
-                                            strokeWidth="1.5"
-                                        />
-                                        <Path
-                                            d={`
+                                    stroke="#8D77FE" //Purple
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['24_26']}
                                                 ${paths['26_27']}
                                                 ${paths['27_28']}
@@ -369,11 +352,11 @@ const Home = ({ navigation }) => {
                                                 ${paths['30_31']}
                                                 ${paths['29_32']}
                                             `}
-                                            stroke="#B67734" //Orange
-                                            strokeWidth="1.5"
-                                        />
-                                        <Path
-                                            d={`
+                                    stroke="#B67734" //Orange
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['4_37']}
                                                 ${paths['33_37']}
                                                 ${paths['33_34']}
@@ -381,22 +364,22 @@ const Home = ({ navigation }) => {
                                                 ${paths['34_36']}
                                                 ${paths['10_36']}
                                             `}
-                                            stroke="#42A0C4" //Blue
-                                            strokeWidth="1.5"
-                                        />
-                                        <Path
-                                            d={`
+                                    stroke="#42A0C4" //Blue
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={`
                                                 ${paths['37_38']}
                                                 ${paths['38_39']}
                                             `}
-                                            stroke="#FFD000" //Yellow
-                                            strokeWidth="1.5"
-                                        />
-                                        <Path
-                                            d={shortestChamberPath}
-                                            stroke="#4BB543"
-                                            strokeWidth="4"
-                                        />
+                                    stroke="#FFD000" //Yellow
+                                    strokeWidth="1.5"
+                                />
+                                <Path
+                                    d={shortestChamberPath}
+                                    stroke="#4BB543"
+                                    strokeWidth="4"
+                                />
                                 {
                                     Object.keys(nodes).map(node => {
                                         return (
@@ -404,14 +387,32 @@ const Home = ({ navigation }) => {
                                                 <G>
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                                    <SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>
+                                                    {/*<SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>*/}
                                                 </G>
                                             </TouchableWithoutFeedback>
                                         )
                                     })
                                 }
-                                {selectedNode.own && <Use href="#mypoint" x={nodes[selectedNode.own][0]-16} y={nodes[selectedNode.own][1]-30} />}
-                                {selectedNode.fire && <Use href="#firepoint" x={nodes[selectedNode.fire][0]-17} y={nodes[selectedNode.fire][1]-25} />}
+                                {selectedNode.own && <Image
+                                    x={nodes[selectedNode.own][0] - 12}
+                                    y={nodes[selectedNode.own][1] - 12}
+                                    width={25}
+                                    height={25}
+                                    preserveAspectRatio="xMidYMid slice"
+                                    opacity={1.0}
+                                    href={worker}
+                                    clipPath="url(#clip)"
+                                />}
+                                {selectedNode.fire && <Image
+                                    x={nodes[selectedNode.fire][0] - 12}
+                                    y={nodes[selectedNode.fire][1] - 18}
+                                    width={25}
+                                    height={25}
+                                    //preserveAspectRatio="xMidYMid slice"
+                                    opacity={1.0}
+                                    href={fire}
+                                    clipPath="url(#clip)"
+                                />}
 
                                 <Use href="#refugeChamber" x="255" y="330" />
                                 <Use href="#refugeChamber" x="231" y="273" />
@@ -445,24 +446,24 @@ const Home = ({ navigation }) => {
                 </ReactNativeZoomableView>
             </View>
             {!modalVisible && <TouchableOpacity
-                style={[styles.save_button,styles.flexRow,styles.alignCenter]}
-                onPress={()=>{setIsSelectingOwnNode(true);setModalVisible(true);modalReset()}}
+                style={[styles.save_button, styles.flexRow, styles.alignCenter]}
+                onPress={() => { setIsSelectingOwnNode(true); setModalVisible(true); modalReset() }}
             >
-                <Icon name="exclamation-triangle" size={20} color="white"/>
-                <Text style={[styles.marginLeft8,styles.save_button_text]}>Save Me</Text>
+                <Icon name="exclamation-triangle" size={20} color="white" />
+                <Text style={[styles.marginLeft8, styles.save_button_text]}>Save Me</Text>
             </TouchableOpacity>}
-            <BottomPopUp _this={{modalVisible,setModalVisible,isSelectingOwnNode,modalNext,modalReset}} />
+            <BottomPopUp _this={{ modalVisible, setModalVisible, isSelectingOwnNode, modalNext, modalReset }} />
             <Modal
                 style={styles.keymap_modal}
-                onBackButtonPress={()=>setKeymapModalVisible(false)}
+                onBackButtonPress={() => setKeymapModalVisible(false)}
                 isVisible={keymapModalVisible}>
                 <View>
-                    <Image source={key_map}/>
+                    <Image2 source={key_map} />
                     <TouchableOpacity
                         style={[styles.close_button]}
-                        onPress={()=>{setKeymapModalVisible(false)}}
+                        onPress={() => { setKeymapModalVisible(false) }}
                     >
-                        <Icon name="times-circle" size={40} color="tomato"/>
+                        <Icon name="times-circle" size={40} color="tomato" />
                     </TouchableOpacity>
                 </View>
             </Modal>
