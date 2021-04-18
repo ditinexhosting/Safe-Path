@@ -116,6 +116,7 @@ const Home = ({ navigation }) => {
         '14_15': 'M 292 282 L 256 295 M 250 296 L 240 299',
         '15_16': 'M 240 299 C 220,295 226,280 226,279',
         '16_17': 'M 226,279 S 228,272 237,265 M 235,267 L 229.5,261 L 220,270',
+        '6_16': 'M 226,279 S 228,272 237,265 ',
         '14_18': 'M 292 282 L 280 286.5',
         '18_19': 'M 280 286.5 S 284,296 292.5,293.5 M 298,292.5 L 325,288 M 306,290.5 L 301,272 S 292,260 291.5,277',
         // Greenish Path
@@ -218,18 +219,28 @@ const Home = ({ navigation }) => {
             return Toast.show({ type: 'success', message: 'You are already near a Refuge Camp!' })
         if (selectedNode.own != selectedNode.fire) {
             nonFireGraph[selectedNode.fire] = null
-            if (nonFireGraph[selectedNode.own][selectedNode.fire])
-                nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
+            //if (nonFireGraph[selectedNode.own][selectedNode.fire])
+            //    nonFireGraph[selectedNode.own][selectedNode.fire] = "Infinity"
         }
+
+        // In case fire accident happened in a node that has refugee chamber
+        let refugeChambersWithoutFireNode = [...refugeChambers]
+        if(refugeChambersWithoutFireNode.indexOf(selectedNode.fire) > -1){
+            let index = refugeChambersWithoutFireNode.indexOf(selectedNode.fire)
+            refugeChambersWithoutFireNode.splice(index,1)
+        }
+        //console.log('refugeChambersWithoutFireNode >> ',refugeChambersWithoutFireNode)
+
         const ownNode = selectedNode.own
         var shortestChamber = null
         // console.log(nonFireGraph)
-        for (var i = 0; i < refugeChambers.length; i++) {
-            const shortestPath = FindShortestPath(nonFireGraph, ownNode, refugeChambers[i])
+        for (var i = 0; i < refugeChambersWithoutFireNode.length; i++) {
+            const shortestPath = FindShortestPath(nonFireGraph, ownNode, refugeChambersWithoutFireNode[i])
             // console.log(shortestPath, i)
             if (!shortestChamber || shortestChamber.distance > shortestPath.distance)
                 shortestChamber = shortestPath
         }
+        console.log(shortestChamber)
         setShortestRawData(shortestChamber)
         // // make path
         var pathSvg = ""
@@ -300,6 +311,7 @@ const Home = ({ navigation }) => {
                                         ${paths['14_15']}
                                         ${paths['15_16']}
                                         ${paths['16_17']}
+                                        ${paths['6_16']}
                                         ${paths['14_18']}
                                     `}
                                     stroke="#F42C71" //Pink
@@ -393,7 +405,7 @@ const Home = ({ navigation }) => {
                                                 <G>
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="4" fill="#0B0A0A" />
                                                     <Circle cx={nodes[node][0]} cy={nodes[node][1]} r="3" fill="#FF6276" />
-                                                    {<SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>}
+                                                    {/*<SVGText x={nodes[node][0]} y={nodes[node][1]} stroke="#8000FF" dy="-8" dx="-5" fontSize="8px">{node}</SVGText>*/}
                                                 </G>
                                             </TouchableWithoutFeedback>
                                         )
